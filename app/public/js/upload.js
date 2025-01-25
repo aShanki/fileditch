@@ -26,10 +26,64 @@ async function logout() {
     }
 }
 
+function updateFileInfo(file) {
+    const fileInfo = document.querySelector('.file-info');
+    if (file) {
+        fileInfo.textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+        fileInfo.style.display = 'block';
+    } else {
+        fileInfo.textContent = 'Maximum size: 5GB';
+    }
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const label = document.querySelector('.file-input-label');
+    label.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const label = document.querySelector('.file-input-label');
+    label.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const label = document.querySelector('.file-input-label');
+    label.classList.remove('drag-over');
+    
+    const fileInput = document.getElementById('file');
+    const files = e.dataTransfer.files;
+    
+    if (files.length > 0) {
+        fileInput.files = files;
+        updateFileInfo(files[0]);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Display max file size in the UI
     const maxSizeInMB = 5120; // from .env
-    document.getElementById('file').setAttribute('title', `Maximum file size: ${formatFileSize(maxSizeInMB * 1024 * 1024)}`);
+    const fileInput = document.getElementById('file');
+    const fileLabel = document.querySelector('.file-input-label');
+    
+    fileInput.setAttribute('title', `Maximum file size: ${formatFileSize(maxSizeInMB * 1024 * 1024)}`);
+
+    // File input change handler
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        updateFileInfo(file);
+    });
+
+    // Drag and drop handlers
+    fileLabel.addEventListener('dragover', handleDragOver);
+    fileLabel.addEventListener('dragleave', handleDragLeave);
+    fileLabel.addEventListener('drop', handleDrop);
 
     // Logout button handler
     document.getElementById('logoutButton').addEventListener('click', logout);
@@ -41,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const fileInput = document.getElementById('file');
         const expireHours = document.getElementById('expireHours');
         const uploadButton = document.getElementById('uploadButton');
         const progressBar = document.getElementById('uploadProgress');
@@ -92,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('expiryTime').textContent = formatDate(data.expiresAt);
                         resultDiv.style.display = 'block';
                         e.target.reset();
+                        updateFileInfo(null);
                     } else {
                         errorDiv.textContent = data.error || 'Upload failed';
                         errorDiv.style.display = 'block';

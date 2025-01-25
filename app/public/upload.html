@@ -13,8 +13,12 @@
         <h1>Upload File</h1>
         <form id="uploadForm">
             <div class="form-group">
-                <label for="file">Select File</label>
-                <input type="file" id="file" required>
+                <div class="file-input-container">
+                    <input type="file" id="file" required>
+                    <label for="file" class="file-input-label">
+                        Click or drag file here to upload
+                    </label>
+                </div>
                 <small class="file-info">Maximum size: 5GB</small>
             </div>
             <div class="form-group">

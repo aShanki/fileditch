@@ -1,9 +1,11 @@
 :root {
-    --primary-color: #2196F3;
-    --error-color: #f44336;
-    --success-color: #4CAF50;
-    --text-color: #333;
-    --bg-color: #f5f5f5;
+    --primary-color: #ffffff;
+    --error-color: #cccccc;
+    --success-color: #999999;
+    --text-color: #e0e0e0;
+    --bg-color: #121212;
+    --container-bg-color: #1e1e1e;
+    --border-color: #333;
 }
 
 * {
@@ -26,10 +28,10 @@ body {
 }
 
 .container {
-    background: white;
+    background: var(--container-bg-color);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     width: 100%;
     max-width: 500px;
     text-align: center;
@@ -37,7 +39,7 @@ body {
 
 h1 {
     margin-bottom: 2rem;
-    color: var(--primary-color);
+    color: var(--text-color);
 }
 
 .form-group {
@@ -49,28 +51,88 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    color: var(--text-color);
 }
 
 input[type="password"],
-input[type="number"],
-input[type="file"] {
+input[type="number"] {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1rem;
+    background-color: #2a2a2a;
+    color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="password"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #666;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.file-input-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+input[type="file"] {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    background-color: #2a2a2a;
+    border: 2px dashed var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-color);
+}
+
+.file-input-label:hover {
+    border-color: #666;
+    background-color: #323232;
+}
+
+.file-input-label::before {
+    content: '📁';
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.file-input-label.drag-over {
+    border-color: #666;
+    background-color: #323232;
+    transform: scale(1.01);
 }
 
 .file-info {
     display: block;
-    margin-top: 0.25rem;
-    color: #666;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    color: #bbb;
     font-size: 0.875rem;
+    word-break: break-all;
 }
 
 button {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: #404040;
+    color: var(--text-color);
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
@@ -80,22 +142,22 @@ button {
 }
 
 button:hover {
-    background-color: #1976D2;
+    background-color: #505050;
 }
 
 button:disabled {
-    background-color: #bbb;
+    background-color: #333;
     cursor: not-allowed;
 }
 
 .error {
-    color: var(--error-color);
+    color: #999;
     margin: 1rem 0;
     display: none;
 }
 
 .success {
-    color: var(--success-color);
+    color: #ccc;
     margin: 1rem 0;
     display: none;
 }
@@ -103,21 +165,23 @@ button:disabled {
 #result {
     margin-top: 2rem;
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     display: none;
+    background-color: var(--container-bg-color);
 }
 
 #urlDisplay {
     word-break: break-all;
     margin: 1rem 0;
     padding: 0.5rem;
-    background: #f8f9fa;
+    background: #2a2a2a;
     border-radius: 4px;
+    color: var(--text-color);
 }
 
 .copy-btn {
-    background-color: #6c757d;
+    background-color: #404040;
     margin-left: 0.5rem;
 }
 
@@ -128,7 +192,7 @@ button:disabled {
 #uploadProgress {
     width: 100%;
     height: 4px;
-    background-color: #f0f0f0;
+    background-color: #333;
     border-radius: 2px;
     margin-bottom: 0.5rem;
     display: none;
@@ -138,14 +202,14 @@ button:disabled {
 #uploadBar {
     width: 0%;
     height: 100%;
-    background-color: var(--primary-color);
+    background-color: #666;
     border-radius: 2px;
     transition: width 0.3s ease;
 }
 
 #progressText {
     font-size: 0.875rem;
-    color: #666;
+    color: #bbb;
 }
 
 .logout-btn {
@@ -154,10 +218,10 @@ button:disabled {
     right: 1rem;
     background-color: transparent;
     color: var(--text-color);
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
 }
 
 .logout-btn:hover {
-    background-color: #f0f0f0;
+    background-color: #333;
     color: var(--text-color);
 }
