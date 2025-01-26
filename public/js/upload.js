@@ -1,4 +1,4 @@
-document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+document.getElementById('uploadForm').addEventListener('submit', (e) => {
     e.preventDefault();
     
     const file = document.getElementById('file').files[0];
@@ -7,6 +7,9 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     const resultDiv = document.getElementById('result');
     const urlDisplay = document.getElementById('urlDisplay');
     const expiryTime = document.getElementById('expiryTime');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadBar = document.getElementById('uploadBar');
+    const progressText = document.getElementById('progressText');
     
     if (!file) {
         errorDiv.textContent = 'Please select a file';
@@ -14,58 +17,96 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         return;
     }
 
-    // Hide previous results/errors
+    // Hide previous results/errors and show progress
     errorDiv.style.display = 'none';
     resultDiv.style.display = 'none';
+    uploadProgress.style.display = 'block';
+    progressText.textContent = 'Preparing upload...';
 
     // Create FormData
     const formData = new FormData();
     formData.append('file', file);
     formData.append('expireHours', expireHours.toString());
 
-    try {
-        const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData
-        });
+    // Create and configure XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload', true);
 
-        const data = await response.json();
-
-        if (response.ok) {
-            // Show success message and URL
-            resultDiv.style.display = 'block';
-            urlDisplay.innerHTML = `URL: <a href="${data.url}" target="_blank">${data.url}</a>`;
-            expiryTime.textContent = new Date(data.expiresAt).toLocaleString();
-
-            // Clear form
-            document.getElementById('uploadForm').reset();
-
-            // Setup copy button
-            const copyButton = document.getElementById('copyButton');
-            copyButton.onclick = () => {
-                navigator.clipboard.writeText(data.url)
-                    .then(() => {
-                        copyButton.textContent = 'Copied!';
-                        setTimeout(() => {
-                            copyButton.textContent = 'Copy URL';
-                        }, 2000);
-                    })
-                    .catch(() => {
-                        copyButton.textContent = 'Failed to copy';
-                        setTimeout(() => {
-                            copyButton.textContent = 'Copy URL';
-                        }, 2000);
-                    });
-            };
-        } else {
-            errorDiv.textContent = data.error || 'Upload failed';
-            errorDiv.style.display = 'block';
+    // Upload progress handler
+    xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            uploadBar.style.width = percentComplete + '%';
+            progressText.textContent = `Uploading: ${Math.round(percentComplete)}%`;
         }
-    } catch (err) {
-        errorDiv.textContent = 'An error occurred. Please try again.';
+    };
+
+    // Response handler
+    xhr.onload = function() {
+        try {
+            const data = JSON.parse(xhr.responseText);
+            
+            if (xhr.status === 200) {
+                // Show success message and URL
+                resultDiv.style.display = 'block';
+                urlDisplay.innerHTML = `URL: <a href="${data.url}" target="_blank">${data.url}</a>`;
+                expiryTime.textContent = new Date(data.expiresAt).toLocaleString();
+                progressText.textContent = 'Upload complete!';
+
+                // Clear form
+                document.getElementById('uploadForm').reset();
+                
+                // Reset progress bar after a delay
+                setTimeout(() => {
+                    uploadProgress.style.display = 'none';
+                    uploadBar.style.width = '0%';
+                    progressText.textContent = '';
+                }, 2000);
+
+                // Setup copy button
+                const copyButton = document.getElementById('copyButton');
+                copyButton.onclick = () => {
+                    navigator.clipboard.writeText(data.url)
+                        .then(() => {
+                            copyButton.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyButton.textContent = 'Copy URL';
+                            }, 2000);
+                        })
+                        .catch(() => {
+                            copyButton.textContent = 'Failed to copy';
+                            setTimeout(() => {
+                                copyButton.textContent = 'Copy URL';
+                            }, 2000);
+                        });
+                };
+            } else {
+                errorDiv.textContent = data.error || 'Upload failed';
+                errorDiv.style.display = 'block';
+                uploadProgress.style.display = 'none';
+                uploadBar.style.width = '0%';
+                progressText.textContent = '';
+            }
+        } catch (err) {
+            errorDiv.textContent = 'An error occurred while processing the response';
+            errorDiv.style.display = 'block';
+            uploadProgress.style.display = 'none';
+            uploadBar.style.width = '0%';
+            progressText.textContent = '';
+        }
+    };
+
+    // Error handler
+    xhr.onerror = function() {
+        errorDiv.textContent = 'Network error occurred. Please try again.';
         errorDiv.style.display = 'block';
-        console.error('Upload error:', err);
-    }
+        uploadProgress.style.display = 'none';
+        uploadBar.style.width = '0%';
+        progressText.textContent = '';
+    };
+
+    // Send the request
+    xhr.send(formData);
 });
 
 // Drag and drop handling
