@@ -1,0 +1,26 @@
+# Version control
+.git
+.gitignore
+
+# Development
+*.md
+install.sh
+.env
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Data directories
+data/*
+!data/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Dependencies
+/vendor
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
