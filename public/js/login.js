@@ -16,7 +16,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (response.ok) {
-            window.location.href = '/';
+            window.location.href = '/upload';  // Changed from '/' to '/upload'
         } else {
             errorDiv.textContent = data.error || 'Invalid password';
             errorDiv.style.display = 'block';
@@ -24,5 +24,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     } catch (err) {
         errorDiv.textContent = 'An error occurred. Please try again.';
         errorDiv.style.display = 'block';
+        console.error('Login error:', err);
     }
 });
